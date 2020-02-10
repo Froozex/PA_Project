@@ -47,6 +47,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import pa.unicam.forza4.AlgoritmoIA;
 import pa.unicam.forza4.GestorePartita;
 import pa.unicam.forza4.Giocatore;
 import pa.unicam.forza4.GiocatoreIA;
@@ -201,10 +202,17 @@ public class JavaFXapp extends Application {
 					    	alert.setTitle("Errore");
 					    	alert.setHeaderText(null);
 					    	alert.setContentText("Inserisci la difficoltà del tuo avversario!");
+					    	alert.showAndWait();
 					    	return;}
-				    	else
+				    	else if (nome1.getText().trim().isEmpty() || nome1.getText().trim()==null || nome2.getText().trim().isEmpty() || nome2.getText().trim()==null){
+				    		Alert alert = new Alert(AlertType.WARNING);
+					    	alert.setTitle("Errore");
+					    	alert.setHeaderText(null);
+					    	alert.setContentText("Inserisci il nome dei giocatori!");
+					    	alert.showAndWait();
+					    	return;} else
 				    	gameStart(conferma);
-				    	return;}
+				    	}
 				    
 				});
 				
@@ -282,16 +290,20 @@ public class JavaFXapp extends Application {
 				settingsWindow.setY(stage.getY()+100);
 				settingsWindow.show();
 				
-				if(nome1.getText().trim().isEmpty()) {
-					Alert alert = new Alert(AlertType.WARNING);
-					alert.setTitle("Warning Dialog");
-					alert.setHeaderText(null);
-					alert.setContentText("Inserisci il nome dei giocatori!");
-
-					alert.showAndWait();
-					return;
-				}
-				
+				conferma.setOnAction(new EventHandler<ActionEvent>() {
+					 
+				    @Override
+				    public void handle(ActionEvent e) {
+				    	if (nome1.getText().trim().isEmpty() || nome1.getText().trim()==null || nome2.getText().trim().isEmpty() || nome2.getText().trim()==null){
+		    		Alert alert = new Alert(AlertType.WARNING);
+			    	alert.setTitle("Errore");
+			    	alert.setHeaderText(null);
+			    	alert.setContentText("Inserisci il nome dei giocatori!");
+			    	alert.showAndWait();
+			    	return;} else
+		    	gameStart(conferma);
+		    	}
+				});
 				
 				
 			}
@@ -383,19 +395,20 @@ private Shape creaGriglia() {
 			rett.setOnMouseClicked(e -> {
 				try {
 					placeDisc(new Disc(redMove), column);
-					rett.setOnMouseClicked(null);
+					
 					
 					
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
 				});
+				
 			
 			listCol.add(rett);
 			
 		}
-		
 		return listCol;
 		
 	}
@@ -420,14 +433,24 @@ private Shape creaGriglia() {
 
         TranslateTransition animation = new TranslateTransition(Duration.seconds(0.5), disc);
         animation.setToY(row * (CELL_SIZE + 5) + CELL_SIZE / 4);
+        
         animation.setOnFinished(e -> {
+        	
             if (gameEnded(column, currentRow)) {
-                gameOver();
+                try {
+					gameOver();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             }
+           
 
             redMove = !redMove;
+            
         });
         animation.play();
+        //INSERIRE DISABILITAZIONE MOUSE E RIATTIVAZIONE IN 500 MILLISECONDI
         
     }
 	
@@ -476,7 +499,22 @@ private Shape creaGriglia() {
     }
 	
 	//metodo stampa vincitore
-	private void gameOver() {
+	private void gameOver() throws Exception {
+		Alert alert = new Alert(AlertType.INFORMATION);
+    	alert.setTitle("VITTORIA!");
+    	alert.setHeaderText(null);
+    	alert.setContentText("Il vincitore è " + (redMove ? "RED" : "YELLOW"));
+    	alert.setOnHidden(evt -> {
+			try {
+				start(stage);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+
+    	alert.show();
+    	
         System.out.println("Winner: " + (redMove ? "RED" : "YELLOW"));
     }
 	
