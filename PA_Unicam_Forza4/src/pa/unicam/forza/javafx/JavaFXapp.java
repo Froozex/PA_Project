@@ -31,6 +31,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -66,6 +67,7 @@ public class JavaFXapp extends Application {
 	private GestorePartita arbitro;
 	private Parametri parametri;
 	private Giocatore[] giocatore;
+	private GiocatoreIA giocatoreIA;
 	
 	private static final int CELL_SIZE = 80;
 	private boolean redMove = true;
@@ -82,6 +84,7 @@ public class JavaFXapp extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub
 		this.stage = primaryStage;
+		primaryStage.setResizable(false);
 		this.stage.setTitle("Forza 4");
 		
 		startWindow();
@@ -100,7 +103,7 @@ public class JavaFXapp extends Application {
     public void startWindow() {
         
     	firstBorderWindow = new BorderPane();
-    	Scene scene = new Scene(firstBorderWindow,400,400);
+    	Scene scene = new Scene(firstBorderWindow,600,600);
 		stage.setScene(scene);
 		
 		//MenuBar
@@ -132,23 +135,25 @@ public class JavaFXapp extends Application {
     	
     	homeScene = new AnchorPane();
     	
-    
-    	Text gioco = new  Text("FORZA 4");
+    	ImageView title = new ImageView("titleScreen.png");
+    	title.toBack();
     	Button GvG = new Button();
+    	GvG.toFront();
     	GvG.setText("GIOCA CONTRO UN AMICO");
     	Button GvIA = new Button();
+    	GvIA.toFront();
     	GvIA.setText("GIOCA CONTRO LA CPU");
-    	AnchorPane.setTopAnchor(gioco, 200.0);
-    	AnchorPane.setLeftAnchor(gioco, 180.0);
+    	GvG.setPrefSize(200, 70);
+    	GvIA.setPrefSize(200, 70);
     	AnchorPane.setLeftAnchor(GvG, 40.0);
-    	AnchorPane.setBottomAnchor(GvG, 60.0);
+    	AnchorPane.setBottomAnchor(GvG, 80.0);
     	AnchorPane.setRightAnchor(GvIA, 40.0);
-    	AnchorPane.setBottomAnchor(GvIA, 60.0);
+    	AnchorPane.setBottomAnchor(GvIA, 80.0);
     	//funzionalità dei button
     	windowGvIA(GvIA);
     	windowGvG(GvG);
     	
-    	homeScene.getChildren().addAll(GvG, GvIA, gioco);
+    	homeScene.getChildren().addAll(title, GvG, GvIA);
     	firstBorderWindow.setCenter(homeScene);
     }
     
@@ -193,6 +198,20 @@ public class JavaFXapp extends Application {
 				
 				closeEvent(annulla);
 				
+				
+				
+				settingsGvIA.getChildren().add(grid);
+				
+				//set scena
+				Scene sceneGvIA = new Scene(settingsGvIA, 450, 350);
+				Stage settingsWindow = new Stage();
+				settingsWindow.setResizable(false);
+				settingsWindow.setTitle("IMPOSTAZIONI PARTITA VS CPU");
+				settingsWindow.setScene(sceneGvIA);
+				settingsWindow.initModality(Modality.WINDOW_MODAL);
+				settingsWindow.setX(stage.getX()+200);
+				settingsWindow.setY(stage.getY()+100);
+				settingsWindow.show();
 				conferma.setOnAction(new EventHandler<ActionEvent>() {
 					 
 				    @Override
@@ -210,23 +229,13 @@ public class JavaFXapp extends Application {
 					    	alert.setHeaderText(null);
 					    	alert.setContentText("Inserisci il nome dei giocatori!");
 					    	alert.showAndWait();
-					    	return;} else
-				    	gameStart(conferma);
+					    	return;
+					    	} 
+				    	else
+				    		gameStart(conferma);
 				    	}
 				    
 				});
-				
-				settingsGvIA.getChildren().add(grid);
-				
-				//set scena
-				Scene sceneGvIA = new Scene(settingsGvIA, 450, 350);
-				Stage settingsWindow = new Stage();
-				settingsWindow.setTitle("IMPOSTAZIONI PARTITA VS CPU");
-				settingsWindow.setScene(sceneGvIA);
-				settingsWindow.initModality(Modality.WINDOW_MODAL);
-				settingsWindow.setX(stage.getX()+200);
-				settingsWindow.setY(stage.getY()+100);
-				settingsWindow.show();
 				
 				
 			}
@@ -283,6 +292,7 @@ public class JavaFXapp extends Application {
 				//set scene
 				Scene sceneGvG = new Scene(settingsGvG, 450, 350);
 				Stage settingsWindow = new Stage();
+				settingsWindow.setResizable(false);
 				settingsWindow.setTitle("IMPOSTAZIONI PARTITA VS ALTRO GIOCATORE");
 				settingsWindow.setScene(sceneGvG);
 				settingsWindow.initModality(Modality.WINDOW_MODAL);
@@ -300,7 +310,8 @@ public class JavaFXapp extends Application {
 			    	alert.setHeaderText(null);
 			    	alert.setContentText("Inserisci il nome dei giocatori!");
 			    	alert.showAndWait();
-			    	return;} else
+			    	return;
+			    	} else
 		    	gameStart(conferma);
 		    	}
 				});
@@ -336,7 +347,8 @@ public class JavaFXapp extends Application {
 private Parent createContent() throws InterruptedException {
 		
 		Pane root = new Pane();
-		Shape gridShape = creaGriglia();
+		ImageView gridShape = creaGriglia();
+		gridShape.toFront();
 		root.getChildren().add(gridShape);
 		root.getChildren().add(discRoot);
 		root.getChildren().addAll(selectColonna());
@@ -344,10 +356,13 @@ private Parent createContent() throws InterruptedException {
 		return root;
 	}
     
-private Shape creaGriglia() {
+private ImageView creaGriglia() {
+	
+	ImageView image = new ImageView("Griglia_img.png");
 		
-		Shape field = new Rectangle((Griglia.COLONNE + 1) * CELL_SIZE, (Griglia.RIGHE + 1) * CELL_SIZE);
-		
+		/*Shape field = new Rectangle((Griglia.COLONNE + 1) * CELL_SIZE, (Griglia.RIGHE + 1) * CELL_SIZE);
+		Shape bg = new Rectangle((Griglia.COLONNE + 1) * CELL_SIZE, (Griglia.RIGHE + 1) * CELL_SIZE);
+		bg.setFill(Color.BLUE);
 		//creazione della griglia vuota
 		for(int y=0; y<Griglia.RIGHE; y++) {
 			for(int x=0; x<Griglia.COLONNE; x++) {
@@ -356,10 +371,10 @@ private Shape creaGriglia() {
 				cella.setCenterY(CELL_SIZE / 2);
 				cella.setTranslateX(x * (CELL_SIZE + 5) + CELL_SIZE / 4);
 				cella.setTranslateY(y* (CELL_SIZE + 5) + CELL_SIZE / 4);
-				
-				field = field.subtract(field, cella);
+				cella.setFill(Color.BLACK);
+				field = field.intersect(field, cella);
 			}
-		}
+		}*/
 		//effetto luci sulla griglia
 		Light.Distant light = new Light.Distant();
 		light.setAzimuth(45.0);
@@ -368,9 +383,9 @@ private Shape creaGriglia() {
 		Lighting lighting = new Lighting();
 		lighting.setLight(light);
 		lighting.setSurfaceScale(5.0);
+		return image;
 		
-		field.setFill(Color.BLUE);
-		return field;
+		
 	}
 	
 	//mostra in trasparenza la colonna quando si passa con il mouse
@@ -395,8 +410,6 @@ private Shape creaGriglia() {
 			rett.setOnMouseClicked(e -> {
 				try {
 					placeDisc(new Disc(redMove), column);
-					
-					
 					
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
@@ -426,7 +439,9 @@ private Shape creaGriglia() {
             return;
 
         grid[column][row] = disc;
+        discRoot.toBack();
         discRoot.getChildren().add(disc);
+        
         disc.setTranslateX(column * (CELL_SIZE + 5) + CELL_SIZE / 4);
 
         final int currentRow = row;
@@ -531,9 +546,10 @@ private Shape creaGriglia() {
         public Disc(boolean red) {
             super(CELL_SIZE / 2, red ? Color.RED : Color.YELLOW);
             this.red = red;
-
+            toBack();
             setCenterX(CELL_SIZE / 2);
             setCenterY(CELL_SIZE / 2);
+            
         }
     }
    
