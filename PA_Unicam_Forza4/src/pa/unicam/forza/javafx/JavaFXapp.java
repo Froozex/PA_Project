@@ -350,6 +350,9 @@ private Parent createContent() throws InterruptedException {
 		ImageView gridShape = creaGriglia();
 		gridShape.toFront();
 		root.getChildren().add(gridShape);
+	
+		discRoot.getChildren().clear();
+		
 		root.getChildren().add(discRoot);
 		root.getChildren().addAll(selectColonna());
 		
@@ -359,7 +362,12 @@ private Parent createContent() throws InterruptedException {
 private ImageView creaGriglia() {
 	
 	ImageView image = new ImageView("Griglia_img.png");
-		
+	image.toFront();
+	for(int y=0; y<Griglia.RIGHE; y++) {
+		for(int x=0; x<Griglia.COLONNE; x++) {
+			grid[x][y] = null;
+		}}
+	
 		/*Shape field = new Rectangle((Griglia.COLONNE + 1) * CELL_SIZE, (Griglia.RIGHE + 1) * CELL_SIZE);
 		Shape bg = new Rectangle((Griglia.COLONNE + 1) * CELL_SIZE, (Griglia.RIGHE + 1) * CELL_SIZE);
 		bg.setFill(Color.BLUE);
@@ -399,7 +407,7 @@ private ImageView creaGriglia() {
 			rett.setTranslateX(x * (CELL_SIZE + 5) + CELL_SIZE / 4);
 			rett.setFill(Color.TRANSPARENT);
 			
-			rett.setOnMouseEntered(e -> rett.setFill(Color.rgb(200, 200, 50, 0.3)));
+			rett.setOnMouseEntered(e -> rett.setFill(Color.rgb(200, 200, 50, 0.2)));
 			
 			rett.setOnMouseExited(e -> rett.setFill(Color.TRANSPARENT));
 			
@@ -519,8 +527,9 @@ private ImageView creaGriglia() {
     	alert.setTitle("VITTORIA!");
     	alert.setHeaderText(null);
     	alert.setContentText("Il vincitore è " + (redMove ? "RED" : "YELLOW"));
-    	alert.setOnHidden(evt -> {
+    	alert.setOnCloseRequest(evt -> {
 			try {
+				stage.hide();
 				start(stage);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -544,7 +553,7 @@ private ImageView creaGriglia() {
 	private static class Disc extends Circle {
         private final boolean red;
         public Disc(boolean red) {
-            super(CELL_SIZE / 2, red ? Color.RED : Color.YELLOW);
+            super(40, red ? Color.RED : Color.YELLOW);
             this.red = red;
             toBack();
             setCenterX(CELL_SIZE / 2);
@@ -552,5 +561,4 @@ private ImageView creaGriglia() {
             
         }
     }
-   
 }
